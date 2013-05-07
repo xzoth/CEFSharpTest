@@ -28,6 +28,12 @@ namespace CEFSharpTest
             }
         }
 
+        public long ProgressBarSpan
+        {
+            get;
+            set;
+        }
+
         public ProgressBar ProgressBar
         {
             get

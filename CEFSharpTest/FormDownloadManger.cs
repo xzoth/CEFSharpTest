@@ -65,17 +65,24 @@ namespace CEFSharpTest
             {
                 var itemControl = new DownloadItemControl();
                 itemControl.FileName = item.SourceFileName;
-                unsafe
+
+                bool isOverFlow = (item.ContentLength > (long)int.MaxValue);
+
+                if (isOverFlow)
                 {
-                    if (item.ContentLength > (long)int.MaxValue)
-                    {
-                        //此处溢出
-                        itemControl.ProgressBar.Maximum = (int)item.ContentLength;
-                    }
-                    itemControl.ProgressBar.Value = (int)item.CurrLength;
-                    //itemControl.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-                    //itemControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Left)))) ;
+                    //计算单位刻度
+                    long ProgressBarSpan = item.ContentLength / int.MaxValue;
+                    itemControl.ProgressBar.Maximum = int.MaxValue;
+                    itemControl.ProgressBar.Value = (int)(item.CurrLength / ProgressBarSpan);
                 }
+                else
+                {
+                    itemControl.ProgressBar.Maximum = (int)item.ContentLength;
+                    itemControl.ProgressBar.Value = (int)item.CurrLength;
+                }
+
+                //itemControl.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+                //itemControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Left)))) ;
 
                 itemPanel.Controls.Add(itemControl);
             }
