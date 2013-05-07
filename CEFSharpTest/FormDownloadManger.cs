@@ -36,7 +36,6 @@ namespace CEFSharpTest
         public bool Cancel(DownloadItem item)
         {
             item.IsCancel = true;
-            UpdateView();
 
             return true;
         }
@@ -45,16 +44,53 @@ namespace CEFSharpTest
         {
             downloadList.Add(item);
 
-            UpdateView();
+            item.PropertyChanged += item_PropertyChanged;
+
+            var itemControl = new DownloadItemControl();
+            itemControl.Name = item.DownloadID.ToString();
+            itemControl.FileName = item.SourceFileName;
+
+            UpdateProgressBar(item, itemControl);
+
+            itemPanel.Controls.Add(itemControl);
 
             return true;
+        }
+
+        private static void UpdateProgressBar(DownloadItem item, DownloadItemControl itemControl)
+        {
+            bool isOverFlow = (item.ContentLength > (long)int.MaxValue);
+
+            if (isOverFlow)
+            {
+                //计算单位刻度
+                long ProgressBarSpan = item.ContentLength / int.MaxValue;
+                itemControl.ProgressBar.Maximum = int.MaxValue;
+                itemControl.ProgressBar.Value = (int)(item.CurrLength / ProgressBarSpan);
+            }
+            else
+            {
+                itemControl.ProgressBar.Maximum = (int)item.ContentLength;
+                itemControl.ProgressBar.Value = (int)item.CurrLength;
+            }
+        }
+
+        void item_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == DownloadItem.CONST_PROPERTY_CURRLENGTH)
+            {
+                var item = sender as DownloadItem;
+                var itemControl = itemPanel.Controls.Find(item.DownloadID.ToString(), false)[0] as DownloadItemControl;
+
+                UpdateProgressBar(item, itemControl);
+            }
         }
 
         public void Complete(DownloadItem item)
         {
             //TODO: play a sound
 
-            UpdateView();
+            item.IsComplete = true;
         }
 
         public void UpdateView()

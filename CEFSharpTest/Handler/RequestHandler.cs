@@ -59,12 +59,7 @@ namespace CEFSharpTest
 
                     handler = downloadHandler;
 
-
-
-
-
                     (downloadManager as FormDownloadManger).Show();
-                    downloadManager.UpdateView();
                     
                     return true;
                 }
@@ -79,8 +74,6 @@ namespace CEFSharpTest
             item.CurrLength += e.DataLength;
             
             e.IsCancel = item.IsCancel;
-
-            downloadManager.UpdateView();
         }
 
         void downloadHandler_OnDownloadComplete(Guid id)
