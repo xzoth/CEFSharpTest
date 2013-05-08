@@ -60,6 +60,7 @@ namespace CEFSharpTest
                     handler = downloadHandler;
 
                     (downloadManager as FormDownloadManger).Show();
+                    (downloadManager as FormDownloadManger).BringToFront();
                     
                     return true;
                 }
