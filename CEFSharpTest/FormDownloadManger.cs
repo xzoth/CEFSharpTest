@@ -48,7 +48,7 @@ namespace CEFSharpTest
 
             var itemControl = new DownloadItemControl();
             itemControl.Name = item.DownloadID.ToString();
-            itemControl.FileName = item.SourceFileName;
+            itemControl.FileName = item.SaveFileName;
 
             UpdateProgressBar(item, itemControl);
 
@@ -146,5 +146,11 @@ namespace CEFSharpTest
         }
 
         public IList<DownloadItem> MockList = new List<DownloadItem>();
+
+        private void FormDownloadManger_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            this.Hide();
+        }
     }
 }

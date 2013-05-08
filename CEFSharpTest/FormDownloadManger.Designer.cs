@@ -66,6 +66,7 @@
             this.MinimizeBox = false;
             this.Name = "FormDownloadManger";
             this.Text = "下载";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormDownloadManger_FormClosing);
             this.Load += new System.EventHandler(this.FormDownloadManger_Load);
             this.ResumeLayout(false);
 
