@@ -12,6 +12,5 @@ namespace CEFSharpTest
         bool Cancel(DownloadItem item);
         bool Add(DownloadItem item);
         void Complete(DownloadItem item);
-        void UpdateView();
     }
 }

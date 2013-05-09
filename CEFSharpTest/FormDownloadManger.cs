@@ -59,14 +59,18 @@ namespace CEFSharpTest
 
         private static void UpdateProgressBar(DownloadItem item, DownloadItemControl itemControl)
         {
-            bool isOverFlow = (item.ContentLength > (long)int.MaxValue);
-
-            if (isOverFlow)
+            //文件大小溢出
+            if (item.ContentLength > (long)int.MaxValue)
             {
                 //计算单位刻度
                 long ProgressBarSpan = item.ContentLength / int.MaxValue;
                 itemControl.ProgressBar.Maximum = int.MaxValue;
                 itemControl.ProgressBar.Value = (int)(item.CurrLength / ProgressBarSpan);
+            }
+            else if (item.ContentLength == -1)//文件大小无法获得
+            {
+                itemControl.ProgressBar.Style = ProgressBarStyle.Marquee;
+                //itemControl.ProgressBar.MarqueeAnimationSpeed = 1000;
             }
             else
             {
@@ -80,10 +84,15 @@ namespace CEFSharpTest
             if (e.PropertyName == DownloadItem.CONST_PROPERTY_CURRLENGTH)
             {
                 var item = sender as DownloadItem;
-                var itemControl = itemPanel.Controls.Find(item.DownloadID.ToString(), false)[0] as DownloadItemControl;
+                var itemControl = GetControlByID(item.DownloadID);
 
                 UpdateProgressBar(item, itemControl);
             }
+        }
+
+        DownloadItemControl GetControlByID(Guid downloadID)
+        {
+            return (itemPanel.Controls.Find(downloadID.ToString(), false)[0] as DownloadItemControl);
         }
 
         public void Complete(DownloadItem item)
@@ -91,61 +100,14 @@ namespace CEFSharpTest
             //TODO: play a sound
 
             item.IsComplete = true;
-        }
+            var itemControl = GetControlByID(item.DownloadID);
 
-        public void UpdateView()
-        {
-            itemPanel.Controls.Clear();
-
-            foreach (var item in downloadList)
-            {
-                var itemControl = new DownloadItemControl();
-                itemControl.FileName = item.SourceFileName;
-
-                bool isOverFlow = (item.ContentLength > (long)int.MaxValue);
-
-                if (isOverFlow)
-                {
-                    //计算单位刻度
-                    long ProgressBarSpan = item.ContentLength / int.MaxValue;
-                    itemControl.ProgressBar.Maximum = int.MaxValue;
-                    itemControl.ProgressBar.Value = (int)(item.CurrLength / ProgressBarSpan);
-                }
-                else
-                {
-                    itemControl.ProgressBar.Maximum = (int)item.ContentLength;
-                    itemControl.ProgressBar.Value = (int)item.CurrLength;
-                }
-
-                //itemControl.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-                //itemControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Left)))) ;
-
-                itemPanel.Controls.Add(itemControl);
-            }
+            itemControl.ProgressBar.Visible = false;
         }
 
         private void FormDownloadManger_Load(object sender, EventArgs e)
         {
-            //MockList.Add(new DownloadItem()
-            //{
-            //    DownloadID = Guid.NewGuid(),
-            //    FileName = "windows8 x64.iso",
-            //    ContentLength = 409600,
-            //    CurrLength = 10240
-            //});
-
-            //MockList.Add(new DownloadItem()
-            //{
-            //    DownloadID = Guid.NewGuid(),
-            //    FileName = "office 2013 toolkit.rar",
-            //    ContentLength = 2560,
-            //    CurrLength = 1299
-            //});
-
-            //UpdateView();
         }
-
-        public IList<DownloadItem> MockList = new List<DownloadItem>();
 
         private void FormDownloadManger_FormClosing(object sender, FormClosingEventArgs e)
         {
